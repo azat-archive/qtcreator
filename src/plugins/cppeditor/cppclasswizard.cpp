@@ -42,6 +42,9 @@
 #include <utils/newclasswidget.h>
 #include <utils/qtcassert.h>
 
+#include <projectexplorer/projectexplorer.h>
+#include <projectexplorer/project.h>
+
 #include <QDebug>
 #include <QDir>
 #include <QTextStream>
@@ -137,6 +140,8 @@ CppClassWizardParameters  CppClassWizardDialog::parameters() const
 {
     CppClassWizardParameters rc;
     const Utils::NewClassWidget *ncw = m_classNamePage->newClassWidget();
+    qDebug() << "Extracted project name is: " << ProjectExplorer::ProjectExplorerPlugin::currentProject()->displayName();
+    rc.projectName = ProjectExplorer::ProjectExplorerPlugin::currentProject()->displayName();
     rc.className = ncw->className();
     rc.headerFile = ncw->headerFileName();
     rc.sourceFile = ncw->sourceFileName();
@@ -221,10 +226,12 @@ bool CppClassWizard::generateHeaderAndSource(const CppClassWizardParameters &par
 
     const QString headerLicense =
             CppTools::AbstractEditorSupport::licenseTemplate(params.headerFile,
-                                                             params.className);
+                                                             params.className,
+                                                             params.projectName);
     const QString sourceLicense =
             CppTools::AbstractEditorSupport::licenseTemplate(params.sourceFile,
-                                                             params.className);
+                                                             params.className,
+                                                             params.projectName);
 
     const QString unqualifiedClassName = namespaceList.takeLast();
     const QString guard = Utils::headerGuard(params.headerFile, namespaceList);

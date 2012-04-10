@@ -71,6 +71,7 @@ private:
 
 struct CppClassWizardParameters
 {
+    QString projectName;
     QString className;
     QString headerFile;
     QString sourceFile;

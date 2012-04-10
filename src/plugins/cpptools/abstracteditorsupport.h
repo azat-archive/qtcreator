@@ -59,7 +59,7 @@ public:
                               const QString &fileName,
                               int line, int column);
 
-    static QString licenseTemplate(const QString &file = QString(), const QString &className = QString());
+    static QString licenseTemplate(const QString &file = QString(), const QString &className = QString(), const QString &projectName = QString());
 
 private:
     CPlusPlus::CppModelManagerInterface *m_modelmanager;

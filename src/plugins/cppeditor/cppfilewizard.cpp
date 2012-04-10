@@ -37,6 +37,9 @@
 #include <cpptools/abstracteditorsupport.h>
 #include <utils/codegeneration.h>
 
+#include <projectexplorer/projectexplorer.h>
+#include <projectexplorer/project.h>
+
 #include <QTextStream>
 #include <QFileInfo>
 #include <QDebug>
@@ -61,18 +64,19 @@ Core::GeneratedFiles CppFileWizard::generateFilesFromPath(const QString &path,
 {
     const QString mimeType = m_type == Source ? QLatin1String(Constants::CPP_SOURCE_MIMETYPE) : QLatin1String(Constants::CPP_HEADER_MIMETYPE);
     const QString fileName = Core::BaseFileWizard::buildFileName(path, name, preferredSuffix(mimeType));
+    const QString projectName = ProjectExplorer::ProjectExplorerPlugin::currentProject()->displayName();
 
     Core::GeneratedFile file(fileName);
-    file.setContents(fileContents(m_type, fileName));
+    file.setContents(fileContents(m_type, fileName, projectName));
     file.setAttributes(Core::GeneratedFile::OpenEditorAttribute);
     return Core::GeneratedFiles() << file;
 }
 
-QString CppFileWizard::fileContents(FileType type, const QString &fileName) const
+QString CppFileWizard::fileContents(FileType type, const QString &fileName, const QString &projectName) const
 {
     QString contents;
     QTextStream str(&contents);
-    str << CppTools::AbstractEditorSupport::licenseTemplate(fileName);
+    str << CppTools::AbstractEditorSupport::licenseTemplate(fileName, "", projectName);
     switch (type) {
     case Header: {
             const QString guard = Utils::headerGuard(fileName);

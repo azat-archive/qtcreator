@@ -52,7 +52,7 @@ public:
                   QObject *parent = 0);
 
 protected:
-    QString fileContents(FileType type, const QString &baseName) const;
+    QString fileContents(FileType type, const QString &baseName, const QString &projectName = QString()) const;
 
 protected:
     Core::GeneratedFiles generateFilesFromPath(const QString &path,

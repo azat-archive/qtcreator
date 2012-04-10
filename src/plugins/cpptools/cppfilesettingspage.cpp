@@ -116,6 +116,7 @@ bool CppFileSettings::equals(const CppFileSettings &rhs) const
 static bool keyWordReplacement(const QString &keyWord,
                                const QString &file,
                                const QString &className,
+                               const QString &projectName,
                                QString *value)
 {
     if (keyWord == QLatin1String("%YEAR%")) {
@@ -133,6 +134,10 @@ static bool keyWordReplacement(const QString &keyWord,
     if (keyWord == QLatin1String("%CLASS%")) {
         *value = className;
         return true;
+    }
+    if (keyWord == QLatin1String("%PROJECT%") || keyWord == QLatin1String("%PROJECT_NAME%")) {
+      *value = projectName;
+      return true;
     }
     if (keyWord == QLatin1String("%FILENAME%")) {
         *value = QFileInfo(file).fileName();
@@ -170,8 +175,10 @@ static bool keyWordReplacement(const QString &keyWord,
 
 // Parse a license template, scan for %KEYWORD% and replace if known.
 // Replace '%%' by '%'.
-static void parseLicenseTemplatePlaceholders(QString *t, const QString &file, const QString &className)
+static void parseLicenseTemplatePlaceholders(QString *t, const QString &file, const QString &className, const QString &projectName)
 {
+    qDebug() << "Current project name is: " << projectName;
+
     int pos = 0;
     const QChar placeHolder = QLatin1Char('%');
     do {
@@ -187,7 +194,7 @@ static void parseLicenseTemplatePlaceholders(QString *t, const QString &file, co
         } else {
             const QString keyWord = t->mid(placeHolderPos, endPlaceHolderPos + 1 - placeHolderPos);
             QString replacement;
-            if (keyWordReplacement(keyWord, file, className, &replacement)) {
+        if (keyWordReplacement(keyWord, file, className, projectName, &replacement)) {
                 t->replace(placeHolderPos, keyWord.size(), replacement);
                 pos = placeHolderPos + replacement.size();
             } else {
@@ -199,9 +206,8 @@ static void parseLicenseTemplatePlaceholders(QString *t, const QString &file, co
 }
 
 // Convenience that returns the formatted license template.
-QString CppFileSettings::licenseTemplate(const QString &fileName, const QString &className)
+QString CppFileSettings::licenseTemplate(const QString &fileName, const QString &className, const QString &projectName)
 {
-
     const QSettings *s = Core::ICore::settings();
     QString key = QLatin1String(Constants::CPPTOOLS_SETTINGSGROUP);
     key += QLatin1Char('/');
@@ -221,7 +227,7 @@ QString CppFileSettings::licenseTemplate(const QString &fileName, const QString 
     licenseStream.setAutoDetectUnicode(true);
     QString license = licenseStream.readAll();
 
-    parseLicenseTemplatePlaceholders(&license, fileName, className);
+    parseLicenseTemplatePlaceholders(&license, fileName, className, projectName);
     // Ensure exactly one additional new line separating stuff
     const QChar newLine = QLatin1Char('\n');
     if (!license.endsWith(newLine))

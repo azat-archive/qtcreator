@@ -63,7 +63,7 @@ struct CppFileSettings
 
     // Convenience to return a license template completely formatted.
     // Currently made public in
-    static QString licenseTemplate(const QString &file = QString(), const QString &className = QString());
+    static QString licenseTemplate(const QString &file = QString(), const QString &className = QString(), const QString &projectName = QString());
 
     bool equals(const CppFileSettings &rhs) const;
     bool operator==(const CppFileSettings &s) const { return equals(s); }
